@@ -1,0 +1,59 @@
+project: PGFS++
+experiment_name: PGFSpp_delta_qed_scale
+reaction_mode: bi
+masking: r2_available
+reward: delta_qed
+max_episode_len: 4
+dataset:
+  training_file: data/reactants_train.pkl
+  test_file: data/reactants_test.pkl
+  templates_file: data/templates.pkl
+  r2_valid_indices_file: data/r2_valid_indices.npz
+  start_strategy: random_pool
+in_out_sim:
+  enabled: true
+  sim_mode: per_episode_in_out
+  reaction_level_scale: [0.0, 0.5, 0.5, 0.5, 0.5]  # multiplicative input-output bonus
+  sim_cap: 0.99
+  sim_floor: 0.25
+  outside_sim_floor_cap: 0.1
+  power: 1.0
+  require_positive: true
+  minscore: 0.0
+  fp_radius: 2
+  fp_size: 1024
+  after_mean_reactions: 0.0
+env:
+  algorithm_family: ppo_bi_attention
+  use_stop_action: true
+  stop_early_penalty: 0.0
+  stop_penalty_until_step: 3
+  invalid_reaction_penalty: -1.0
+  reward_round_digits: 3
+  info_qed_round_digits: 3
+training:
+  seed: 123456
+  total_timesteps: 1000000
+  eval_freq: 10000
+  save_freq: 100000
+ppo_bi:
+  policy_arch: hierarchical
+  r2_arch: lookup
+  eval_r2_pool: train
+  r2_scoring: sparse_r2_scoring
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.05
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: 0.02
+  trunk_hidden: 256
+  template_embed_dim: 64
+  r2_embed_dim: 64
+  r2_resample_retries: 16
+  normalize_advantage: true
