@@ -99,7 +99,7 @@ class SehScorer:
                 scale=float(cfg.get("scale", 8.0)),
                 mock=bool(cfg.get("mock", False)),
             )
-        use_mock = parsed.mock or os.environ.get("GENMOLRL_MOCK_SEH", "").lower() in {
+        use_mock = parsed.mock or os.environ.get("PGFSPP_MOCK_SEH", "").lower() in {
             "1",
             "true",
             "yes",

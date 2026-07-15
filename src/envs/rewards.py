@@ -838,7 +838,7 @@ def qed(smiles: str | None) -> float:
 
 
 class RewardFunction:
-    SUPPORTED = frozenset({"delta_qed", "final_qed", "final_seh", "delta_vina", "delta_seh"})
+    SUPPORTED = frozenset({"delta_qed", "final_qed", "final_seh", "delta_seh"})
 
     def __init__(
         self,
@@ -846,7 +846,6 @@ class RewardFunction:
         invalid_penalty: float = -1.0,
         round_digits: int | None = None,
         qed_round_digits: int | None = None,
-        vina_scorer=None,
         seh_scorer=None,
     ):
         # ``qed`` is the canonical name for per-step absolute QED: every
@@ -861,15 +860,12 @@ class RewardFunction:
             reward_type = "final_seh"
         if reward_type not in self.SUPPORTED:
             raise ValueError(f"Unsupported reward type: {reward_type}")
-        if reward_type == "delta_vina" and vina_scorer is None:
-            raise ValueError("delta_vina requires a configured VinaScorer")
         if reward_type in {"delta_seh", "final_seh"} and seh_scorer is None:
             raise ValueError(f"{reward_type} requires a configured SehScorer")
         self.reward_type = reward_type
         self.invalid_penalty = float(invalid_penalty)
         self.round_digits = round_digits
         self.qed_round_digits = qed_round_digits
-        self.vina_scorer = vina_scorer
         self.seh_scorer = seh_scorer
 
     def _maybe_round(self, value: float) -> float:
@@ -886,9 +882,6 @@ class RewardFunction:
     def step_reward(self, previous_smiles: str | None, current_smiles: str | None) -> float:
         if not current_smiles:
             return self.invalid_penalty
-        if self.reward_type == "delta_vina":
-            delta = self.vina_scorer.step_delta(previous_smiles, current_smiles)
-            return self._maybe_round(delta)
         if self.reward_type == "delta_seh":
             delta = self.seh_scorer.step_delta(previous_smiles, current_smiles)
             return self._maybe_round(delta)

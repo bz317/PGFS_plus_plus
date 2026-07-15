@@ -110,8 +110,6 @@ def _step_reward(trainer: BiPPO, pre_smiles: str, product: str) -> float:
     """Per-step training reward (matches rollout: Δobjective on valid reactions)."""
     if trainer.reward_name == "delta_seh" and trainer.seh_scorer is not None:
         return float(trainer.seh_scorer.step_delta(pre_smiles, product))
-    if trainer.reward_name == "delta_vina" and trainer.vina_scorer is not None:
-        return float(trainer.vina_scorer.step_delta(pre_smiles, product))
     pre_qed = _qed(pre_smiles, round_digits=trainer.qed_round_digits)
     next_qed = _qed(product, round_digits=trainer.qed_round_digits)
     return float(next_qed - pre_qed)
@@ -389,7 +387,7 @@ def run_detailed_eval(
     reward_name = str(config.get("reward", ""))
     primary_delta_array = (
         objective_delta_array
-        if reward_name in {"delta_seh", "delta_vina"}
+        if reward_name in {"delta_seh"}
         else qed_delta_array
     )
 
@@ -445,20 +443,9 @@ def run_detailed_eval(
             float(objective_delta_array.mean()) if objective_delta_array.size else 0.0
         )
         summary["avg_delta_seh"] = summary["mean_delta_seh"]
-    elif reward_name == "delta_vina":
-        summary["max_vina"] = best_objective
-        summary["best_vina"] = best_objective
-        summary["mean_delta_vina"] = (
-            float(objective_delta_array.mean()) if objective_delta_array.size else 0.0
-        )
-        summary["avg_delta_vina"] = summary["mean_delta_vina"]
 
     mode_note = f" ({inference_mode} inference)"
-    header = (
-        "# GraphTransPPO-Bi detailed evaluation results"
-        if algo_label.upper() == "GRAPHTRANSPPO_BI"
-        else "# PPO-Bi detailed evaluation results"
-    ) + mode_note + "\n"
+    header = f"# PPO-Bi detailed evaluation results{mode_note}\n"
     with out_path.open("w", encoding="utf-8") as handle:
         handle.write(header + "\n")
         handle.write("[summary]\n")

@@ -25,8 +25,6 @@ PPO_COMPATIBLE_METRICS = [
     "eval/max_seh",
     "eval/max_episode_seh",
     "eval/mean_start_seh",
-    "eval/mean_final_delta_vina",
-    "eval/mean_best_delta_vina",
     "eval/avg_delta_qed",
     "eval/std_reward",
     "eval/n_molecules",

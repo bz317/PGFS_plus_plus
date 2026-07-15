@@ -33,7 +33,6 @@ from src.chem.representations import (
     make_representation,
 )
 from src.chem.qed_scores_store import try_load_qed_scores_store
-from src.chem.vina_scorer import VinaScorer
 from src.chem.seh_scorer import SehScorer
 from src.config import resolve_path
 from src.envs.rewards import (
@@ -238,15 +237,10 @@ class BiPPO:
                 "(pattern-match, fast with rejection backstop)."
             )
         self.reward_name = config.get("reward", "delta_qed")
-        if self.reward_name not in {"delta_qed", "delta_vina", "delta_seh"}:
+        if self.reward_name not in {"delta_qed", "delta_seh"}:
             raise ValueError(
-                "ppo_bi currently supports reward: delta_qed, delta_vina, or delta_seh"
+                "ppo_bi currently supports reward: delta_qed or delta_seh"
             )
-        self.vina_scorer = (
-            VinaScorer.from_config(config.get("vina"))
-            if self.reward_name == "delta_vina"
-            else None
-        )
         self.seh_scorer = (
             SehScorer.from_config(config.get("seh"))
             if self.reward_name == "delta_seh"
@@ -1567,11 +1561,7 @@ class BiPPO:
                     reward = self.invalid_reaction_penalty
                     done = True
                 else:
-                    if self.reward_name == "delta_vina":
-                        reward = float(
-                            self.vina_scorer.step_delta(current, product)
-                        )
-                    elif self.reward_name == "delta_seh":
+                    if self.reward_name == "delta_seh":
                         reward = float(
                             self.seh_scorer.step_delta(current, product)
                         )
@@ -2034,9 +2024,6 @@ class BiPPO:
         """Scalar objective for the configured training reward."""
         if not smiles:
             return 0.0
-        if self.reward_name == "delta_vina":
-            assert self.vina_scorer is not None
-            return float(self.vina_scorer.reward(smiles))
         if self.reward_name == "delta_seh":
             assert self.seh_scorer is not None
             return float(self.seh_scorer.reward(smiles))
@@ -2149,9 +2136,6 @@ class BiPPO:
             if self.reward_name == "delta_seh":
                 empty["eval/mean_final_delta_seh"] = 0.0
                 empty["eval/mean_best_delta_seh"] = 0.0
-            elif self.reward_name == "delta_vina":
-                empty["eval/mean_final_delta_vina"] = 0.0
-                empty["eval/mean_best_delta_vina"] = 0.0
             return empty
         diversity, top_share, n_unique = self._final_diversity_metrics(final_smiles)
         mean_final_objective = float(np.mean(objective_final_deltas))
@@ -2183,9 +2167,6 @@ class BiPPO:
         elif self.reward_name == "delta_seh":
             metrics["eval/mean_final_delta_seh"] = mean_final_objective
             metrics["eval/mean_best_delta_seh"] = mean_best_objective
-        elif self.reward_name == "delta_vina":
-            metrics["eval/mean_final_delta_vina"] = mean_final_objective
-            metrics["eval/mean_best_delta_vina"] = mean_best_objective
         return metrics
 
     @staticmethod
