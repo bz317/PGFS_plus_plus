@@ -12,7 +12,7 @@ reward: delta_qed
 masking: r2_available
 eval_r2_pool: train
 r2_arch: lookup
-starts_file: data/Bi/reactants_compact_test.pkl
+starts_file: data/reactants_test.pkl
 num_start_molecules: 2000
 start_offset: 0
 total_starts: 2000
@@ -26,7 +26,7 @@ max_episode_len: 4
 positive_delta_fraction: 0.987
 negative_delta_fraction: 0.0065
 zero_delta_fraction: 0.0065
-results_file: run_detailed_results/internal/ppo/4_steps/compact/4s_delta_qed_ymhrz9yg_1m_compact_results.txt
+results_file: run_detailed_results/compact/4s_delta_qed_ymhrz9yg_1m_compact_results.txt
 
 [trajectories]
 path_id	start_smiles	final_smiles	initial_qed	final_qed	max_qed	delta_qed	num_reactions	stopped

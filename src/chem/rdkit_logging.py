@@ -10,7 +10,7 @@ from rdkit import RDLogger
 
 @contextmanager
 def suppress_rdkit_logs() -> Iterator[None]:
-    """Mute rdApp warnings/errors while GenMolRL handles failures in Python.
+    """Mute rdApp warnings/errors while PGFS++ handles failures in Python.
 
     Under ``masking=r2_available`` many (state, template, R2) tuples pass SMARTS
     pattern checks but ``RunReactants`` still emits kekulization / valence

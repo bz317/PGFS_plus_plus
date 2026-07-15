@@ -504,7 +504,7 @@ class BiPPO:
         #     lookup.
         #
         #   - ``_eval_pool_role == "eval"``: build a separate
-        #     ``ReactionManager`` from ``data/Bi/reactants_test.pkl``. Only
+        #     ``ReactionManager`` from ``data/reactants_test.pkl``. Only
         #     legal when ``r2_arch != 'lookup'`` (the lookup-table guard
         #     above already rules this combination out).
         if self._eval_pool_role == "train":

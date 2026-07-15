@@ -88,7 +88,7 @@ Manual entrypoint:
 PYTHONPATH=. python -m src.scripts.run_experiment --config configs/delta_qed_scale.yaml
 ```
 
-Checkpoints are saved under `runs/<wandb_run_id>/`.
+Checkpoints are saved under `runs/<model_name>/`.
 
 **Optional:** regenerate the T-R2 mask cache (shipped as `data/r2_valid_indices.npz`):
 

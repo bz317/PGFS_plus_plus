@@ -134,7 +134,7 @@ class QuickVina2GPU:
         if not gpu_vina_installed(self.vina_path):
             raise FileNotFoundError(
                 f"QuickVina2-GPU executable not found or not executable: {self.vina_path}. "
-                "Build Vina-GPU-2.1 and place it under GenMolRL/bin/QuickVina2-GPU-2-1/."
+                "Build Vina-GPU-2.1 and place it under bin/QuickVina2-GPU-2-1/."
             )
         if self.obabel_path is None:
             raise FileNotFoundError(

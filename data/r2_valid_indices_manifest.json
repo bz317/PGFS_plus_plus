@@ -1,9 +1,9 @@
 {
   "generated_at_utc": "2026-07-03T18:28:46+00:00",
   "artifact_version": 1,
-  "reactants_pkl": "/root/autodl-tmp/GenMolRL/data/Bi/reactants_train.pkl",
-  "templates_pkl": "/root/autodl-tmp/GenMolRL/data/Bi/templates.pkl",
-  "output_npz": "/root/autodl-tmp/GenMolRL/data/Bi/r2_valid_indices.npz",
+  "reactants_pkl": "data/reactants_train.pkl",
+  "templates_pkl": "data/templates.pkl",
+  "output_npz": "data/r2_valid_indices.npz",
   "pool_size": 116415,
   "pool_keys_sha256": "162b553e14f2a0f3a30aa12ca935fb2d653c2326d28101b3d4d77b1951e34496",
   "storage_format": "csr_npz",

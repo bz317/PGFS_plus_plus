@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Re-run compact eval + plot for both AAAI "Ours" checkpoints.
+# Re-run compact eval + plot for both shipped checkpoints.
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 bash "${DIR}/run_eval_delta_qed_scale.sh"

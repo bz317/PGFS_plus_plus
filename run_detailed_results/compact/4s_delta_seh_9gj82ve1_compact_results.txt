@@ -3,7 +3,7 @@
 [summary]
 generated_at_utc: 2026-06-28T12:28:45+00:00
 run_id: 9gj82ve1
-checkpoint: runs/9gj82ve1/final_model.pt
+checkpoint: runs/9gj82ve1/model_step_1001472.pt
 global_step: 1001472
 algorithm: PPO_BI
 inference_mode: greedy
@@ -12,7 +12,7 @@ reward: delta_seh
 masking: r2_available
 eval_r2_pool: train
 r2_arch: lookup
-starts_file: data/Bi/reactants_compact_test.pkl
+starts_file: data/reactants_test.pkl
 num_start_molecules: 2000
 start_offset: 0
 total_starts: 2000
@@ -26,7 +26,7 @@ max_episode_len: 4
 positive_delta_fraction: 0.9955
 negative_delta_fraction: 0.0025
 zero_delta_fraction: 0.002
-results_file: run_detailed_results/internal/ppo/4_steps/compact/4s_delta_seh_9gj82ve1_compact_results.txt
+results_file: run_detailed_results/compact/4s_delta_seh_9gj82ve1_compact_results.txt
 max_seh: 1.027742624282837
 best_seh: 1.027742624282837
 mean_delta_seh: 0.6329683447869793

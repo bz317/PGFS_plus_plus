@@ -1,4 +1,4 @@
-"""Shared RDKit reaction manager for GenMolRL."""
+"""Shared RDKit reaction manager for PGFS++."""
 
 from __future__ import annotations
 
