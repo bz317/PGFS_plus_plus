@@ -33,6 +33,11 @@ def init_wandb(config: dict, algorithm: str, experiment_name: str):
     if value is not None and value not in {"allow", "must", "never", "auto"}:
         os.environ.pop("WANDB_RESUME", None)
 
+    # Training must work without a W&B login. Users who want logging can set
+    # WANDB_API_KEY and/or WANDB_MODE=online.
+    if not os.environ.get("WANDB_MODE") and not os.environ.get("WANDB_API_KEY"):
+        os.environ["WANDB_MODE"] = "disabled"
+
     project = os.getenv("WANDB_PROJECT", config.get("project", "PGFS++"))
     init_kw = {
         "project": project,

@@ -18,6 +18,10 @@ def main() -> None:
     parser.add_argument("--resume-checkpoint")
     parser.add_argument("--run-id")
     parser.add_argument("--total-timesteps", type=int)
+    parser.add_argument("--n-steps", type=int)
+    parser.add_argument("--n-sampled-eval", type=int)
+    parser.add_argument("--eval-freq", type=int)
+    parser.add_argument("--save-freq", type=int)
     parser.add_argument("--wandb-resume", action="store_true")
     args = parser.parse_args()
 
@@ -31,12 +35,21 @@ def main() -> None:
             config["dataset"]["test_file"] = args.test_file
         if args.templates_file:
             config["dataset"]["templates_file"] = args.templates_file
+    training_cfg = config.setdefault("training", {})
     if args.resume_checkpoint:
-        config.setdefault("training", {})["resume_checkpoint"] = args.resume_checkpoint
+        training_cfg["resume_checkpoint"] = args.resume_checkpoint
     if args.run_id:
-        config.setdefault("training", {})["run_id"] = args.run_id
+        training_cfg["run_id"] = args.run_id
     if args.total_timesteps is not None:
-        config.setdefault("training", {})["total_timesteps"] = args.total_timesteps
+        training_cfg["total_timesteps"] = args.total_timesteps
+    if args.n_sampled_eval is not None:
+        training_cfg["n_sampled_eval"] = args.n_sampled_eval
+    if args.eval_freq is not None:
+        training_cfg["eval_freq"] = args.eval_freq
+    if args.save_freq is not None:
+        training_cfg["save_freq"] = args.save_freq
+    if args.n_steps is not None:
+        config.setdefault("ppo_bi", {})["n_steps"] = args.n_steps
     if args.wandb_resume:
         config["wandb_resume"] = True
 

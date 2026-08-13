@@ -1,5 +1,14 @@
-runs/
 __pycache__/
 *.pyc
 .wandb/
 wandb/
+runs/**
+!runs/README.md
+run_detailed_results/plot_cache/
+run_detailed_results/plots/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.ipynb_checkpoints/

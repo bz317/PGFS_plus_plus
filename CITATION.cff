@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "PGFS++: Molecular Improvement Ensuring Synthetic Accessibility under Diversity Constraints"
+message: If you use this software, please cite it as below.
+type: software
+authors:
+  - family-names: Zhang
+    given-names: Boqiao
+license: MIT
+repository-code: https://github.com/bz317/PGFS_plus_plus
+year: 2026

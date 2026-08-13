@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pgfspp"
 version = "0.1.0"
-description = "PGFS++ molecular improvement with PPO"
+description = "PGFS++: molecular improvement ensuring synthetic accessibility under diversity constraints"
 requires-python = ">=3.10"
 dependencies = [
   "numpy",

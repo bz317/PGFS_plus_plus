@@ -2402,28 +2402,30 @@ def run_training_loop(trainer: BiPPO, run, config: dict, experiment_name: str) -
             )
         wandb.log({**rollout_metrics, **update_metrics}, step=global_step)
 
-        bucket = global_step // eval_freq
-        if eval_freq > 0 and bucket > last_eval_bucket:
-            last_eval_bucket = bucket
-            eval_metrics = trainer.evaluate()
-            eval_metrics["train/global_step"] = global_step
-            wandb.log(eval_metrics, step=global_step)
-            if eval_metrics["eval/mean_reward"] > best_eval:
-                best_eval = eval_metrics["eval/mean_reward"]
+        if eval_freq > 0:
+            bucket = global_step // eval_freq
+            if bucket > last_eval_bucket:
+                last_eval_bucket = bucket
+                eval_metrics = trainer.evaluate()
+                eval_metrics["train/global_step"] = global_step
+                wandb.log(eval_metrics, step=global_step)
+                if eval_metrics["eval/mean_reward"] > best_eval:
+                    best_eval = eval_metrics["eval/mean_reward"]
+                    trainer.save(
+                        out_dir / "best_model.pt",
+                        global_step=global_step,
+                        best_eval=best_eval,
+                    )
+
+        if save_freq > 0:
+            sbucket = global_step // save_freq
+            if sbucket > last_save_bucket:
+                last_save_bucket = sbucket
                 trainer.save(
-                    out_dir / "best_model.pt",
+                    out_dir / f"model_step_{global_step}.pt",
                     global_step=global_step,
                     best_eval=best_eval,
                 )
-
-        sbucket = global_step // save_freq
-        if save_freq > 0 and sbucket > last_save_bucket:
-            last_save_bucket = sbucket
-            trainer.save(
-                out_dir / f"model_step_{global_step}.pt",
-                global_step=global_step,
-                best_eval=best_eval,
-            )
 
     final_eval = trainer.evaluate()
     final_eval["train/global_step"] = global_step
