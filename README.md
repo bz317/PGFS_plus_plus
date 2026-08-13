@@ -8,7 +8,7 @@
 
 Official implementation of **PGFS++**, a hierarchical PPO policy that improves a starting molecule by applying reaction templates and optional second reactants. The action space is a library of chemically valid reactions, so every trajectory is a synthesis route. An input–output similarity bonus keeps the product close to the input while still improving the target property (QED or sEH).
 
-This repository is self-contained: reactant pools, reaction templates, the T→R2 mask cache, the sEH proxy, and compact evaluation logs are included.
+This repository is self-contained: reactant pools, reaction templates, the T→R2 mask cache, and the sEH proxy are included.
 
 <p align="center">
   <img src="assets/qed_panel.png" width="280" alt="PGFS++ compact ΔQED evaluation panel">
@@ -28,10 +28,9 @@ This repository is self-contained: reactant pools, reaction templates, the T→R
 | `configs/` | Paper configs (`delta_qed_*`, `delta_seh_*`) and a smoke config |
 | `data/` | Train pool, 2k test set, templates, precomputed T→R2 masks |
 | `scoring/seh/` | Bengio et al. (2021) sEH proxy weights |
-| `run_detailed_results/compact/` | Greedy trajectories used by the default plots |
-| `eval/`, `visualization/` | Compact eval and panel-plot launchers |
+| `eval/` | Greedy eval launchers for the 2k test set |
 
-Paper checkpoints (~91 MB each) are optional and downloaded separately. Default plots do **not** need them.
+Paper checkpoints (~91 MB each) are downloaded separately for evaluation.
 
 ---
 
@@ -115,21 +114,12 @@ bash preprocessing/run_precompute_r2_valid_indices.sh
 
 ## Evaluation
 
-Shipped greedy trajectories for the fixed 2k test set (`data/reactants_test.pkl`) live under `run_detailed_results/compact/`. **Default plots use these files** and do not require GPU or checkpoints.
-
-```bash
-bash eval/run_plot_delta_qed_scale.sh
-bash eval/run_plot_delta_seh_scale.sh
-```
-
-Outputs: `run_detailed_results/plots/compact_qed_panel.{pdf,png}` and `compact_seh_panel.{pdf,png}`. The ΔQED panel is quick. The ΔSEH panel scores the 2k trajectories with the sEH proxy (needs the PyG stack) and takes on the order of one to two minutes.
-
-### Optional: paper checkpoints
+Greedy rollouts on the fixed 2k test set (`data/reactants_test.pkl`). Download the paper checkpoints first, then run:
 
 | Run ID | Reward | Checkpoint |
 |--------|--------|------------|
 | `ymhrz9yg` | ΔQED scale | `runs/ymhrz9yg/model_step_1001472.pt` |
-| `9gj82ve1` | ΔSEH scale | `runs/9gj82ve1/model_step_1001472.pt` |
+| `ncs94oq8` | ΔSEH scale | `runs/ncs94oq8/model_step_1001472.pt` |
 
 ```bash
 bash scripts/download_checkpoints.sh
@@ -137,7 +127,23 @@ bash eval/run_eval_delta_qed_scale.sh
 bash eval/run_eval_delta_seh_scale.sh
 ```
 
-Eval + plot together (needs the checkpoints for the eval step):
+Inference writes these files under `results/` (the directory is created if it is missing):
+
+```
+results/4s_delta_qed_ymhrz9yg_1m_compact_results.txt
+results/4s_delta_qed_ymhrz9yg_1m_compact_results.summary.json
+results/4s_delta_seh_ncs94oq8_1m_compact_results.txt
+results/4s_delta_seh_ncs94oq8_1m_compact_results.summary.json
+```
+
+Optional panels from those logs:
+
+```bash
+bash eval/run_plot_delta_qed_scale.sh
+bash eval/run_plot_delta_seh_scale.sh
+```
+
+Eval + plot together:
 
 ```bash
 bash eval/run_all_compact.sh

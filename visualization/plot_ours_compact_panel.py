@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot PGFS++ (Ours) metrics from shipped detailed trajectory results.
+"""Plot PGFS++ (Ours) metrics from inference trajectory results.
 
 Example: python visualization/plot_ours_compact_panel.py --reward delta_qed
 """
@@ -39,14 +39,12 @@ METHOD = "Ours"
 DATASET = "compact"
 
 DEFAULT_DETAILED: dict[str, Path] = {
-    "delta_qed": REPO
-    / "run_detailed_results/compact/4s_delta_qed_ymhrz9yg_1m_compact_results.txt",
-    "delta_seh": REPO
-    / "run_detailed_results/compact/4s_delta_seh_9gj82ve1_compact_results.txt",
+    "delta_qed": REPO / "results/4s_delta_qed_ymhrz9yg_1m_compact_results.txt",
+    "delta_seh": REPO / "results/4s_delta_seh_ncs94oq8_1m_compact_results.txt",
 }
 DEFAULT_OUTPUT: dict[str, Path] = {
-    "delta_qed": REPO / "run_detailed_results/plots/compact_qed_panel",
-    "delta_seh": REPO / "run_detailed_results/plots/compact_seh_panel",
+    "delta_qed": REPO / "results/compact_qed_panel",
+    "delta_seh": REPO / "results/compact_seh_panel",
 }
 
 
@@ -77,7 +75,7 @@ def build_payload(
     reward: str,
     rebuild: bool,
 ) -> dict:
-    cache_dir = REPO / "run_detailed_results/plot_cache"
+    cache_dir = REPO / "results/plot_cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_path = cache_dir / f"{reward}_ours.json"
     if cache_path.is_file() and not rebuild:
@@ -118,7 +116,7 @@ def plot_panel(*, payload: dict, reward: str, output_prefix: Path) -> None:
     if len(rows) == 1:
         axes = [axes]
 
-    pw_path = REPO / "run_detailed_results/plot_cache" / payload.get(
+    pw_path = REPO / "results/plot_cache" / payload.get(
         "pairwise_distances_file", ""
     )
 
@@ -198,7 +196,7 @@ def main() -> None:
         "--output-prefix",
         type=Path,
         default=None,
-        help="Output path stem without extension (default: run_detailed_results/plots/compact_*_panel)",
+        help="Output path stem without extension (default: results/compact_*_panel)",
     )
     parser.add_argument("--rebuild-cache", action="store_true")
     args = parser.parse_args()

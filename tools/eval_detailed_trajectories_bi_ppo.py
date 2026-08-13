@@ -76,12 +76,49 @@ class StepRow:
         return "\t".join("" if v is None else str(v) for v in values)
 
 
+def _summary_float(value: float) -> float:
+    return float(round(float(value), 7))
+
+
 def _display_path(path: Path) -> str:
     path = Path(resolve_path(path)).resolve()
     try:
         return str(path.relative_to(REPO.resolve()))
     except ValueError:
         return str(path)
+
+
+# Checkpoints trained before the public layout still store data/Bi/... and
+# data/seh/... paths. Map those onto the files shipped in this repo.
+_LEGACY_ARTIFACT_PATHS = {
+    "data/Bi/reactants_train.pkl": "data/reactants_train.pkl",
+    "data/Bi/reactants_test.pkl": "data/reactants_test.pkl",
+    "data/Bi/templates.pkl": "data/templates.pkl",
+    "data/Bi/r2_valid_indices.npz": "data/r2_valid_indices.npz",
+    "data/seh/bengio2021flow_proxy.pkl.gz": "scoring/seh/bengio2021flow_proxy.pkl.gz",
+}
+
+
+def _rewrite_legacy_artifact_paths(config: dict) -> None:
+    dataset = config.setdefault("dataset", {})
+    for key in (
+        "training_file",
+        "test_file",
+        "templates_file",
+        "r2_valid_indices_file",
+    ):
+        raw = dataset.get(key)
+        if not raw:
+            continue
+        mapped = _LEGACY_ARTIFACT_PATHS.get(str(raw), str(raw))
+        if Path(resolve_path(mapped)).is_file():
+            dataset[key] = mapped
+    seh = config.get("seh")
+    if isinstance(seh, dict) and seh.get("weights_path"):
+        raw = str(seh["weights_path"])
+        mapped = _LEGACY_ARTIFACT_PATHS.get(raw, raw)
+        if Path(resolve_path(mapped)).is_file():
+            seh["weights_path"] = mapped
 
 
 def _trainer_cls(config: dict):
@@ -137,6 +174,7 @@ def _record_trajectory(
         "max_qed": max_qed,
         "delta_qed": final.qed - initial_qed,
         "delta_objective": final_objective - initial_objective,
+        "final_objective": final_objective,
         "max_objective": max_objective,
         "num_reactions": num_reactions,
         "stopped": int(stopped),
@@ -292,6 +330,7 @@ def run_detailed_eval(
     checkpoint = Path(resolve_path(checkpoint)).resolve()
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
     config = copy.deepcopy(ckpt["config"])
+    _rewrite_legacy_artifact_paths(config)
     if starts_file is not None:
         starts_file = Path(resolve_path(starts_file)).resolve()
         config.setdefault("dataset", {})
@@ -321,6 +360,9 @@ def run_detailed_eval(
     trainer._swap_active_pool(trainer._eval_pool_role)
     prev_active_keys = trainer._active_r2_keys
     objective_deltas: list[float] = []
+    final_objectives: list[float] = []
+    qed_deltas: list[float] = []
+    final_qeds: list[float] = []
     try:
         if not trainer._sparse_r2_graph_encode():
             with torch.no_grad():
@@ -358,6 +400,9 @@ def run_detailed_eval(
                 best_qed = max(best_qed, float(traj["max_qed"]))
                 best_objective = max(best_objective, float(traj["max_objective"]))
                 objective_deltas.append(float(traj["delta_objective"]))
+                final_objectives.append(float(traj["final_objective"]))
+                qed_deltas.append(float(traj["delta_qed"]))
+                final_qeds.append(float(traj["final_qed"]))
 
                 if (local_id + 1) % 100 == 0:
                     print(
@@ -369,15 +414,11 @@ def run_detailed_eval(
         trainer._swap_active_pool("train")
         trainer._active_r2_keys = prev_active_keys
 
-    qed_deltas = []
-    with traj_tmp.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            if not line.strip():
-                continue
-            parts = line.rstrip("\n").split("\t")
-            qed_deltas.append(float(parts[6]))
     qed_delta_array = (
         np.asarray(qed_deltas, dtype=np.float64) if qed_deltas else np.array([])
+    )
+    final_qed_array = (
+        np.asarray(final_qeds, dtype=np.float64) if final_qeds else np.array([])
     )
     objective_delta_array = (
         np.asarray(objective_deltas, dtype=np.float64)
@@ -417,8 +458,17 @@ def run_detailed_eval(
         "total_reactions": total_reactions,
         "max_qed": best_qed,
         "best_qed": best_qed,
-        "mean_delta_qed": float(qed_delta_array.mean())
+        "mean_delta_qed": _summary_float(qed_delta_array.mean())
         if qed_delta_array.size
+        else 0.0,
+        "median_delta_qed": _summary_float(np.median(qed_delta_array))
+        if qed_delta_array.size
+        else 0.0,
+        "mean_final_qed": _summary_float(final_qed_array.mean())
+        if final_qed_array.size
+        else 0.0,
+        "median_final_qed": _summary_float(np.median(final_qed_array))
+        if final_qed_array.size
         else 0.0,
         "avg_delta_qed": float(qed_delta_array.mean())
         if qed_delta_array.size
@@ -437,10 +487,28 @@ def run_detailed_eval(
         "results_file": _display_path(out_path),
     }
     if reward_name == "delta_seh":
+        final_obj_array = (
+            np.asarray(final_objectives, dtype=np.float64)
+            if final_objectives
+            else np.array([])
+        )
         summary["max_seh"] = best_objective
         summary["best_seh"] = best_objective
         summary["mean_delta_seh"] = (
-            float(objective_delta_array.mean()) if objective_delta_array.size else 0.0
+            _summary_float(objective_delta_array.mean())
+            if objective_delta_array.size
+            else 0.0
+        )
+        summary["median_delta_seh"] = (
+            _summary_float(np.median(objective_delta_array))
+            if objective_delta_array.size
+            else 0.0
+        )
+        summary["mean_final_seh"] = (
+            _summary_float(final_obj_array.mean()) if final_obj_array.size else 0.0
+        )
+        summary["median_final_seh"] = (
+            _summary_float(np.median(final_obj_array)) if final_obj_array.size else 0.0
         )
         summary["avg_delta_seh"] = summary["mean_delta_seh"]
 
@@ -483,7 +551,7 @@ def main() -> None:
         "--out-dir",
         type=Path,
         default=None,
-        help="Output directory (default: run_detailed_results/ppo or gtppo by algorithm)",
+        help="Output directory (default: results/)",
     )
     parser.add_argument(
         "--out-prefix",
@@ -522,14 +590,7 @@ def main() -> None:
     args = parser.parse_args()
 
     checkpoint = Path(resolve_path(args.checkpoint))
-    ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
-    algo = str(ckpt["config"].get("algorithm", "")).upper()
-    default_out = REPO / (
-        "run_detailed_results/gtppo"
-        if algo == "GRAPHTRANSPPO_BI"
-        else "run_detailed_results/ppo"
-    )
-    out_dir = args.out_dir or default_out
+    out_dir = args.out_dir or (REPO / "results")
 
     prefix = args.out_prefix or (
         f"{args.run_id}_detailed" if args.run_id else "ppo_detailed"

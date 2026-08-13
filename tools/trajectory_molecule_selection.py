@@ -8,7 +8,7 @@ MOLECULE_SELECTION = "final"
 
 # SA-score JSON tree (mirrors compute_final_molecule_sa.py outputs).
 SELECTION_SA_ROOT: dict[str, str] = {
-    "final": "run_detailed_results/sa_scores",
+    "final": "results/sa_scores",
 }
 
 

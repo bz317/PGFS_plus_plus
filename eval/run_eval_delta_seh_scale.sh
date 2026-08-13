@@ -5,11 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 export DEVICE="${DEVICE:-cuda}"
 
-RUN_ID=9gj82ve1
+RUN_ID=ncs94oq8
 CHECKPOINT="${CHECKPOINT:-${ROOT}/runs/${RUN_ID}/model_step_1001472.pt}"
 STARTS="${STARTS:-${ROOT}/data/reactants_test.pkl}"
-OUT_DIR="${OUT_DIR:-${ROOT}/run_detailed_results/compact}"
-OUT_PREFIX="${OUT_PREFIX:-4s_delta_seh_${RUN_ID}_compact}"
+OUT_DIR="${OUT_DIR:-${ROOT}/results}"
+OUT_PREFIX="${OUT_PREFIX:-4s_delta_seh_${RUN_ID}_1m_compact}"
 
 python3 "${ROOT}/tools/eval_detailed_trajectories_bi_ppo.py" \
   --checkpoint "${CHECKPOINT}" \

@@ -38,7 +38,7 @@ def build_ours_cache(
     fps = smiles_to_fps(smiles)
     pairwise = pairwise_diversity_distances(fps)
     pw_file = f"{dataset}_ours_pairwise_distances.npy"
-    pw_dir = REPO / "run_detailed_results/plot_cache"
+    pw_dir = REPO / "results/plot_cache"
     pw_dir.mkdir(parents=True, exist_ok=True)
     np.save(pw_dir / pw_file, pairwise)
 

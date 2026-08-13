@@ -4,8 +4,7 @@ __pycache__/
 wandb/
 runs/**
 !runs/README.md
-run_detailed_results/plot_cache/
-run_detailed_results/plots/
+results/
 *.egg-info/
 .eggs/
 dist/

@@ -8,7 +8,7 @@ export DEVICE="${DEVICE:-cuda}"
 RUN_ID=ymhrz9yg
 CHECKPOINT="${CHECKPOINT:-${ROOT}/runs/${RUN_ID}/model_step_1001472.pt}"
 STARTS="${STARTS:-${ROOT}/data/reactants_test.pkl}"
-OUT_DIR="${OUT_DIR:-${ROOT}/run_detailed_results/compact}"
+OUT_DIR="${OUT_DIR:-${ROOT}/results}"
 OUT_PREFIX="${OUT_PREFIX:-4s_delta_qed_${RUN_ID}_1m_compact}"
 
 python3 "${ROOT}/tools/eval_detailed_trajectories_bi_ppo.py" \
