@@ -6,7 +6,7 @@
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB.svg)](https://www.python.org/)
 [![PyTorch 2.3](https://img.shields.io/badge/PyTorch-2.3%20%2B%20CUDA%2012.1-EE4C2C.svg)](https://pytorch.org/)
 
-**PGFS++** is an extension of PGFS, making its performance comparable to leading methods.
+**PGFS++** extends PGFS and achieves competitive performance against leading synthesis-aware molecular optimization methods.
 
 <p align="center">
   <img src="assets/qed_panel.png" width="90%" alt="PGFS++ vs PGFS and variants on the compact QED panel">
