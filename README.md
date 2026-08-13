@@ -6,16 +6,14 @@
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB.svg)](https://www.python.org/)
 [![PyTorch 2.3](https://img.shields.io/badge/PyTorch-2.3%20%2B%20CUDA%2012.1-EE4C2C.svg)](https://pytorch.org/)
 
-Official implementation of **PGFS++**, a hierarchical PPO policy that improves a starting molecule by applying reaction templates and optional second reactants. The action space is a library of chemically valid reactions, so every trajectory is a synthesis route. An input–output similarity bonus keeps the product close to the input while still improving the target property (QED or sEH).
-
-This repository is self-contained: reactant pools, reaction templates, the T→R2 mask cache, and the sEH proxy are included.
+**PGFS++** is an extension of PGFS, making its performance comparable to leading methods.
 
 <p align="center">
-  <img src="assets/qed_panel.png" width="280" alt="PGFS++ compact ΔQED evaluation panel">
+  <img src="assets/qed_panel.png" width="90%" alt="PGFS++ vs PGFS and variants on the compact QED panel">
 </p>
 
 <p align="center">
-  <em>Shipped compact eval on the 2k test set (ΔQED, diversity, input–output similarity).</em>
+  <em>PGFS++ consistently improves PGFS and its variants.</em>
 </p>
 
 ---
